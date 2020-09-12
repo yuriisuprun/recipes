@@ -26,7 +26,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
-    public static final String V1_RECIPE_URI = "v1/recipe/";
+    public static final String V1_RECIPE_URI = "/v1/recipe/";
 
     @Autowired
     public RecipeController(RecipeService recipeService) {
@@ -34,33 +34,33 @@ public class RecipeController {
     }
 
     @GetMapping(path = "{recipeId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> getRecipeById(@PathVariable String recipeId){
+    public Mono<Recipe> getRecipeById(@PathVariable String recipeId) {
 
         return recipeService.getRecipe(recipeId);
     }
 
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Flux<Recipe> getRecipes(){
+    public Flux<Recipe> getRecipes() {
 
         return recipeService.listAllRecipes();
     }
 
     @PostMapping(path = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> createRecipe(@RequestBody Mono<Recipe> recipe){
+    public Mono<Recipe> createRecipe(@RequestBody Mono<Recipe> recipe) {
 
         return recipeService.createRecipe(recipe);
     }
 
     @PutMapping(path = "recipeId", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> updateDescription(@PathVariable String recipeId, @RequestBody Mono<Recipe> recipe){
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Mono<Recipe> updateDescription(@PathVariable String recipeId, @RequestBody Mono<Recipe> recipe) {
 
         return recipeService.updateRecipe(recipeId, recipe);
     }
 
     @DeleteMapping(path = "{recipeId}")
-    public Mono<Boolean> deleteRecipe(@PathVariable String recipeId){
+    public Mono<Boolean> deleteRecipe(@PathVariable String recipeId) {
 
         return recipeService.deleteRecipe(recipeId);
     }
