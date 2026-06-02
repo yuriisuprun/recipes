@@ -42,5 +42,8 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~3.8.3"
+  },
+  "overrides": {
+    "tmp": "0.2.6"
   }
 }
