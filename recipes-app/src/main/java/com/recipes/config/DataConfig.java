@@ -11,23 +11,20 @@ import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 
-/**
- * Created by Yurii_Suprun
- */
-@Profile(value = "local")
+@Profile("local")
 @Configuration
 @Import(EmbeddedMongoAutoConfiguration.class)
 public class DataConfig {
 
-    public static final String DATABASE_NAME = "recipes";
+    private static final String DATABASE_NAME = "recipes";
 
     @Bean
-    public ReactiveMongoDatabaseFactory mongoDatabaseFactory(MongoClient mongoClient){
+    public ReactiveMongoDatabaseFactory mongoDatabaseFactory(MongoClient mongoClient) {
         return new SimpleReactiveMongoDatabaseFactory(mongoClient, DATABASE_NAME);
     }
 
     @Bean
-    public ReactiveMongoOperations reactiveMongoTemplate(ReactiveMongoDatabaseFactory mongoDatabaseFactory){
+    public ReactiveMongoOperations reactiveMongoTemplate(ReactiveMongoDatabaseFactory mongoDatabaseFactory) {
         return new ReactiveMongoTemplate(mongoDatabaseFactory);
     }
 }

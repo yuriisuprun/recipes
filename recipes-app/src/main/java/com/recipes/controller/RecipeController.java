@@ -2,8 +2,10 @@ package com.recipes.controller;
 
 import com.recipes.model.Recipe;
 import com.recipes.service.RecipeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,52 +18,48 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Created by Yurii_Suprun
- */
 @RestController
-@RequestMapping(RecipeController.V1_RECIPE_URI)
-@CrossOrigin
+@RequestMapping("/api/v1/recipes")
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RequiredArgsConstructor
 public class RecipeController {
 
     private final RecipeService recipeService;
 
-    public static final String V1_RECIPE_URI = "/v1/recipe/";
-
-    @Autowired
-    public RecipeController(RecipeService recipeService) {
-        this.recipeService = recipeService;
+    @GetMapping(path = "/{recipeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<Recipe>> getRecipeById(@PathVariable String recipeId) {
+        return recipeService.getRecipe(recipeId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @GetMapping(path = "{recipeId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> getRecipeById(@PathVariable String recipeId) {
-
-        return recipeService.getRecipe(recipeId);
-    }
-
-    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<Recipe> getRecipes() {
-
         return recipeService.listAllRecipes();
     }
 
-    @PostMapping(path = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> createRecipe(@RequestBody Mono<Recipe> recipe) {
-
-        return recipeService.createRecipe(recipe);
+    @PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<Recipe>> createRecipe(@Valid @RequestBody Mono<Recipe> recipe) {
+        return recipeService.createRecipe(recipe)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @PutMapping(path = "recipeId", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Mono<Recipe> updateDescription(@PathVariable String recipeId, @RequestBody Mono<Recipe> recipe) {
-
-        return recipeService.updateRecipe(recipeId, recipe);
+    @PutMapping(path = "/{recipeId}", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<Recipe>> updateRecipe(@PathVariable String recipeId, @Valid @RequestBody Mono<Recipe> recipe) {
+        return recipeService.updateRecipe(recipeId, recipe)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build())
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @DeleteMapping(path = "{recipeId}")
-    public Mono<Boolean> deleteRecipe(@PathVariable String recipeId) {
-
-        return recipeService.deleteRecipe(recipeId);
+    @DeleteMapping(path = "/{recipeId}")
+    public Mono<ResponseEntity<Void>> deleteRecipe(@PathVariable String recipeId) {
+        return recipeService.deleteRecipe(recipeId)
+                .flatMap(deleted -> deleted ? 
+                    Mono.just(ResponseEntity.noContent().<Void>build()) :
+                    Mono.just(ResponseEntity.notFound().build()));
     }
 }

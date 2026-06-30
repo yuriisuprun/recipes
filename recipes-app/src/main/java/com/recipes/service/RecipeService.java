@@ -4,12 +4,9 @@ import com.recipes.model.Recipe;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Created by Yurii_Suprun
- */
 public interface RecipeService {
 
-    Mono<Recipe> getRecipe(String recipeName);
+    Mono<Recipe> getRecipe(String recipeId);
 
     Mono<Recipe> createRecipe(Mono<Recipe> recipeMono);
 
